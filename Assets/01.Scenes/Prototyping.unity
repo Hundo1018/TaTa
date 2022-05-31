@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63e6b02af7a6d894f99f6e944959e5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _horizontalSplitFactor: 5
+  _horizontalSplitFactor: 7
   _verticalSplitFactor: 3
   _movement: 0.1
 --- !u!20 &519420031
@@ -250,7 +250,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 16.548233
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -736,7 +736,7 @@ GameObject:
   - component: {fileID: 1862499169}
   - component: {fileID: 1862499171}
   m_Layer: 6
-  m_Name: Square
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1019,6 +1019,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1172420435384352609, guid: 79048b631d4c5bd438eb21095d5da52b, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1172420435384352610, guid: 79048b631d4c5bd438eb21095d5da52b, type: 3}
       propertyPath: m_Name
       value: PotatoGuy

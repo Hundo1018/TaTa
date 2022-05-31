@@ -35,6 +35,11 @@ namespace Assets._04.Characters.Scripts
         /// </summary>
         /// <returns></returns>
         public Vector2 GetPostion();
+        /// <summary>
+        /// 取得存活時間
+        /// </summary>
+        /// <returns></returns>
+        public float GetSpawnedTime();
         public EntityType GetEntityType();
     }
 }

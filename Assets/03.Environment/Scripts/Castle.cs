@@ -11,31 +11,25 @@ public class Castle : MonoBehaviour, IEntity
     [SerializeField] private float _startTime;
     [SerializeField] private float _prepareTime;
     [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private float _spawnedTime;
     private int _alignment;
     /// <summary>
     /// 生成佇列
     /// </summary>
     //Queue<IMinion> _spawnQueue;
     Queue<GameObject> _spawnQueue = new Queue<GameObject>();
-    int IEntity.GetAlignment()
-    {
-        return _alignment;
-    }
+    int IEntity.GetAlignment() => _alignment;
 
-    string IEntity.GetName()
-    {
-        return name;
-    }
+    string IEntity.GetName() => name;
 
-    Vector2 IEntity.GetPostion()
-    {
-        return transform.position;
-    }
+    Vector2 IEntity.GetPostion() => transform.position;
 
     void IEntity.Hurted(int damage)
     {
         throw new System.NotImplementedException();
     }
+
+    float IEntity.GetSpawnedTime() => _spawnedTime;
 
     /// <summary>
     /// 生小兵
@@ -66,7 +60,7 @@ public class Castle : MonoBehaviour, IEntity
     // Start is called before the first frame update
     void Start()
     {
-
+        _spawnedTime = Time.time;
     }
 
     // Update is called once per frame
@@ -75,7 +69,6 @@ public class Castle : MonoBehaviour, IEntity
         //跑時間，時間到了
         if (_isSpawning && Time.time >= _startTime + _prepareTime)
         {
-            Debug.Log("召喚啦");
             _isSpawning = false;
             Instantiate(_minionPrefab, _spawnPoint.position, new Quaternion());
         }

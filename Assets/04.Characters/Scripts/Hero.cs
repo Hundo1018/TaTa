@@ -5,21 +5,17 @@ using UnityEngine;
 
 public class Hero : MonoBehaviour,IEntity
 {
+    float _spawnedTime;
     int _alignment;
-    int IEntity.GetAlignment()
-    {
-        return _alignment;
-    }
+    int IEntity.GetAlignment() => _alignment;
 
     EntityType IEntity.GetEntityType()
     {
         throw new System.NotImplementedException();
     }
 
-    string IEntity.GetName()
-    {
-        return name;
-    }
+    float IEntity.GetSpawnedTime() => _spawnedTime;
+    string IEntity.GetName() => name;
 
     Vector2 IEntity.GetPostion()
     {

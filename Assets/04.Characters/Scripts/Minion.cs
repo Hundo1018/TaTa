@@ -12,20 +12,31 @@ using Assets._04.Characters.Scripts;
 public class Minion : MonoBehaviour, IEntity, IMinion, ISpawnable
 {
     private Collider2D _collider2D;
+    private Rigidbody2D _rigidbody2D;
     [SerializeField] private EntityType _type;
     [SerializeField] private int _healthPoint;
     [SerializeField] private float _attackSpeed;
     [SerializeField] private int _attack;
     [SerializeField] private float _attackRange;
     private Vector2 _faceDirection;
+    /// <summary>
+    /// 陣營
+    /// </summary>
     [SerializeField] private int _alignment;
     [SerializeField] private int _spawnResource;
     [SerializeField] private int _spawnTime;
     [SerializeField] private float _movement;
+    /// <summary>
+    /// 當下移動速率
+    /// </summary>
+    [SerializeField] private float _velocity;
+    [SerializeField] private float _spawnedTime;
 
     void Awake()
     {
         _collider2D = GetComponent<Collider2D>();
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _spawnedTime = Time.time;
     }
 
     // Start is called before the first frame update
@@ -38,7 +49,6 @@ public class Minion : MonoBehaviour, IEntity, IMinion, ISpawnable
     void Update()
     {
         var entities = CheckAttackRange();
-        entities.ForEach(x => Debug.Log(x));
         ActionStrategy(entities);
     }
 
@@ -55,17 +65,21 @@ public class Minion : MonoBehaviour, IEntity, IMinion, ISpawnable
          * 同時有敵人也有友軍->停下攻擊
          */
         //先用if-else硬幹 等重構
-        if (entities.Count > 1)
+        if (entities.Count > 0)
         {
             //如果有任何敵人
             if (entities.Any(e => { return e.GetAlignment() != _alignment; }))
             {
                 Attack();
             }
-            //如果有任何友軍
+            //如果有任何非自己的友軍
             else if(entities.Any(e => { return e.GetAlignment() == _alignment; }))
             {
-                //停下來
+                //那個友軍比自己還老就停下來讓他先走
+                if (entities.Any(e => { return e.GetAlignment() == _alignment && e.GetSpawnedTime() < _spawnedTime; }))
+                    _rigidbody2D.velocity = Vector2.zero;
+                else
+                    Move();
             }
             else
             {
@@ -82,22 +96,30 @@ public class Minion : MonoBehaviour, IEntity, IMinion, ISpawnable
     /// <summary>
     /// 檢測前方的實體有哪些
     /// </summary>
-    /// <returns>回傳實體</returns>
-    List<IEntity> CheckAttackRange()
+    /// <returns>回傳不包含自己的實體</returns>
+    private List<IEntity> CheckAttackRange()
     {
         Vector3 startPosition = transform.position;
-        startPosition.x += _collider2D.bounds.size.x / 2f + 0.1f;
+        Vector3 endPosition = transform.position + (Vector3)(_faceDirection * _attackRange);
+        endPosition.x += _collider2D.bounds.size.x / 2f;
         //畫一條線
-        Debug.DrawLine(startPosition, transform.position + (Vector3)(_faceDirection * _attackRange));
+        Debug.DrawLine(startPosition, endPosition);
         //射線射出
-        var raycastHit2Ds = Physics2D.RaycastAll(startPosition, _faceDirection, _attackRange).ToList();
-        //回傳IEntity
-        return raycastHit2Ds.ConvertAll(
+        var raycastHit2Ds = Physics2D.RaycastAll(startPosition, _faceDirection, _attackRange + _collider2D.bounds.size.x / 2f).ToList();
+
+        //傳換成IEntity
+        var entities = raycastHit2Ds.ConvertAll(
             (temp) =>
             {
                 return temp.transform.GetComponent<IEntity>();
             }
             );
+        //剔除自己
+        entities.RemoveAll(x =>
+        {
+            return x.GetHashCode() == GetHashCode();
+        });
+        return entities;
     }
 
 
@@ -109,7 +131,7 @@ public class Minion : MonoBehaviour, IEntity, IMinion, ISpawnable
     /// </summary>
     void Move()
     {
-        transform.Translate(_movement * _faceDirection.x, 0, 0);
+        _rigidbody2D.velocity = _faceDirection * _movement;
     }
 
     //見人就扁
@@ -147,7 +169,10 @@ public class Minion : MonoBehaviour, IEntity, IMinion, ISpawnable
     {
         return transform.position;
     }
-
+    float IEntity.GetSpawnedTime()
+    {
+        return _spawnedTime;
+    }
     int ISpawnable.GetSpawnTime()
     {
         return _spawnTime;
